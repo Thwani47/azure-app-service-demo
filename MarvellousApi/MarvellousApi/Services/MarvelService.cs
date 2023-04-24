@@ -9,14 +9,12 @@ namespace MarvellousApi.Services;
 public class MarvelService : IMarvelService
 {
     private readonly MarvelOptions _options;
-    private IMarvelService _marvelServiceImplementation;
-
     public MarvelService(IOptions<MarvelOptions> options)
     {
         _options = options.Value;
     }
     
-    public async Task<List<Character>?> GetCharacters()
+    public async Task<List<Character?>?> GetCharacters()
     {
         var timestamp = DateTime.UtcNow.Ticks.ToString();
         var hash = ApiUtils.ComputeKeyHash(timestamp, _options.PrivateKey, _options.PublicKey);
@@ -36,7 +34,7 @@ public class MarvelService : IMarvelService
         }
 
         Console.WriteLine($"HTTP error {response.StatusCode}");
-        return null;
+        throw new Exception($"Failed to get characters: {response.StatusCode}");
     }
 
     public async Task<Character?> GetCharacter(int characterId)
@@ -54,12 +52,12 @@ public class MarvelService : IMarvelService
             content = content.Replace("\r", "").Replace("\n", "");
             // Console.WriteLine(content);
             var json = JsonConvert.DeserializeObject<ApiResponse<List<Character>>>(content);
-            List<Character?>? characters = json?.Data.Results;
+            var characters = json?.Data.Results;
             return characters?[0];
         }
 
         Console.WriteLine($"HTTP error {response.StatusCode}");
-        return null;
+        throw new Exception($"Failed to get character: {response.StatusCode}");
     }
 
     public async Task<Character?> SearchCharacter(string characterName)
@@ -77,11 +75,11 @@ public class MarvelService : IMarvelService
             content = content.Replace("\r", "").Replace("\n", "");
             // Console.WriteLine(content);
             var json = JsonConvert.DeserializeObject<ApiResponse<List<Character>>>(content);
-            List<Character?>? characters = json?.Data.Results;
-            return characters?[0];
+            var characters = json?.Data.Results?[0];
+            return characters;
         }
 
         Console.WriteLine($"HTTP error {response.StatusCode}");
-        return null;
+        throw new Exception($"Failed to search for character: {response.StatusCode}");
     }
 }

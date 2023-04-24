@@ -2,5 +2,5 @@
 
 public class DataWrapper<T>
 {
-    public T Results { get; set; }
+    public List<Character?>? Results { get; set; }
 }

@@ -16,38 +16,59 @@ public class CharactersController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<Character>> GetCharacters()
+    public async Task<ActionResult<List<Character>>> GetCharacters()
     {
-        var characters = await _marvelService.GetCharacters();
-
-        return characters ?? new List<Character>();
+        try
+        {
+            var characters = await _marvelService.GetCharacters();
+            return characters is null ? Ok(new List<Character>()) : Ok(characters);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new { message = e.Message });
+        }
     }
 
     [HttpGet("{characterId:int}")]
     public async Task<ActionResult<Character>> GetCharacter(int characterId)
     {
-        var character = await _marvelService.GetCharacter(characterId);
-
-        if (character is null)
+        try
         {
-            return NotFound();
-        }
+            var character = await _marvelService.GetCharacter(characterId);
 
-        return Ok(character);
+            if (character is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(character);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new { message = e.Message });
+        }
     }
-    
+
     [HttpGet("search/{characterName}")]
     public async Task<ActionResult<Character>> SearchCharacter(string characterName)
     {
-        var character = await _marvelService.SearchCharacter(characterName);
-
-        if (character is null)
+        try
         {
-            return NotFound();
-        }
+            var character = await _marvelService.SearchCharacter(characterName);
 
-        return Ok(character);
+            if (character is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(character);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            return StatusCode(500, new { message = e.Message });
+        }
     }
-    
-    
 }
