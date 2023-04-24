@@ -98,3 +98,5 @@ MarvellousApi/.idea/
 *.user
 
 MarvellousApi/MarvellousApi/appsettings.Development.json
+
+deploy/
